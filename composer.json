@@ -1,0 +1,19 @@
+{
+  "name": "chepchepcirkus/docktor",
+  "version": "1.0.0",
+  "description": "System perfomance monitoring for docker containers",
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/chepchepcirkus/cssThea.git"
+    }
+  ],
+  "require" : {
+    "chepchepcirkus/cssThea": "dev-master"
+  },
+  "scripts" : {
+    "post-update-cmd" : [
+      "if [ ! -d public/theme/cssThea ]; then ln -s ../../vendor/chepchepcirkus/cssThea/cssThea public/theme; fi"
+    ]
+  }
+}
