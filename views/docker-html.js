@@ -5,6 +5,9 @@ DockerHtml.prototype.renderHtml = function (method, data){
     if(data == null) {
         return '<div class="cont">Invalid data</div>';
     }
+    if(data.length == 0) {
+        return '<div class="cont">Empty data</div>';
+    }
     var html = '';
     if(this[method] != undefined && typeof(this[method]) == 'function') {
         html = this[method](data);
