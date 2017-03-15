@@ -31,44 +31,33 @@ router.get('/', function(req, res) {
     });
 })
 .get('/view/:id', function(req, res) {
+
+    var dataForView = {};
+
 	var container = req.app.docker.getContainer(req.params.id);
-	var dataForView = {}
-    var getInspectData = function(container) {
-        var dockPromise = new Promise(function (resolve, reject) {
-            container.inspect(function (err, data) {
-                    if (err) throw (err)
-                    resolve(data);
-                }
-            )
-        });
-        return dockPromise;
-    };
-	getInspectData(container).then(function(data) {
-        dataForView['inspect'] = data;
-        return dataForView;
-    }).then(function(dataForView) {
+
+    container.inspect()
+    .then(function(container) {
         container.logs(
-        {
-            stdout: 1,
-            stderr: 1,
-            tail: 100,
-            follow: 0
-        }, function (err, data) {
-            if (err) throw(err)
-            incommingMess = '';
-            data.setEncoding('utf8');
-            data.on('data', function (data) {
-                for (var i in data) {
-                    incommingMess += data[i];
-                }
-            });
-            dataForView['log'] = data;
-            return dataForView;
-        });
-    }).catch(function() {
-            req.app.session.setMessage({type : 'error', text: err.message});
-            dataForView['inspect'] = [];
-    }).finally(function() {
+            {
+                stdout: 1,
+                stderr: 1,
+                tail: 100,
+                follow: 0
+            },function(err, data) {
+                data.setEncoding('utf8');
+                data.on('data', function (data) {
+                    for (var i in data) {
+                        dataForView['log'] += data[i];
+                    }
+                });
+            }
+        );
+    })
+    .catch(function(err) {
+        req.app.session.setMessage({type: 'error', text: err.message});
+    })
+    .finally(function(){
         req.app.renderData.data = {
             title:'Containers View',
             content: '<h2>Container View</h2>',
