@@ -22,12 +22,9 @@ DockerHtml.prototype.renderContainersList = function (data){
      */
     var html = '<div class="cont table">';
     html += '<div class="w-10">';
-    html += '<div class="w-2">Name</div>';
-    html += '<div class="w-3">Status</div>';
-    html += '<div class="w-2">Ip</div>';
-    html += '<div class="w-1"></div>';
-    html += '<div class="w-1"></div>';
-    html += '<div class="w-1"></div>';
+    html += '<div class="w-4 a-center">Name</div>';
+    html += '<div class="w-3 a-center">Status</div>';
+    html += '<div class="w-3 a-center">Ip</div>';
     html += '</div>';
     for(var i in data) {
         var ip = '';
@@ -39,16 +36,19 @@ DockerHtml.prototype.renderContainersList = function (data){
             bgState = 'bg-greenthea-light';
         }
     	html += '<div class="w-10 ' + bgState + '" id="' + i + '">'
+    	        + '<div class="w-10">'
                 // + this.renderObjectToStr(data[i], 'list')
-				+ '<div class="w-2">'
-                + i + '<br/>' + data[i].Names[0]
+				+ '<div class="w-4">'
+                + i + ' -- ' + data[i].Names[0]
                 + '</div>'
 				+ '<div class="w-3">'
                 + data[i].Status
                 + '</div>'
-				+ '<div class="w-2">'
+				+ '<div class="w-3">'
                 + ip
                 + '</div>'
+                + '</div>'
+                + '<div class="w-10">'
     			+ '<div class="w-1 a-center">'
     			+ '<a class="button" href="/containers/start/' + data[i]['Id'] + '"><i class="fa fa-play"></i></a>'
 				+ '</div>'
@@ -56,7 +56,11 @@ DockerHtml.prototype.renderContainersList = function (data){
     			+ '<a class="button" href="/containers/stop/' + data[i]['Id'] + '"><i class="fa fa-stop"></i></a>'
     			+ '</div>'
     			+ '<div class="w-1 a-center">'
+    			+ '<a class="button" href="/containers/remove/' + data[i]['Id'] + '"><i class="fa fa-close"></i></a>'
+    			+ '</div>'
+    			+ '<div class="w-1 a-center">'
     			+ '<a class="button" href="/containers/view/' + data[i]['Id'] + '"><i class="fa fa-bar-chart"></i></a>'
+    			+ '</div>'
     			+ '</div>'
     			+ '</div>';
     }
