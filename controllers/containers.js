@@ -91,5 +91,17 @@ router.get('/', function(req, res) {
     	res.redirect('back')
     })
 })
+.get('/remove/:id', function(req, res) {
+	var container = req.app.docker.getContainer(req.params.id)
+	var opts = {}
+    container.remove(opts, function(err, data) {
+        if(err) {
+            req.app.session.setMessage({type : 'error', text: err.message});
+        } else {
+            req.app.session.setMessage({type : 'success', text: 'container has been removed'});
+        }
+    	res.redirect('back')
+    })
+})
 
 module.exports = router
