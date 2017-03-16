@@ -12,8 +12,7 @@ app.use(express.static(__dirname + '/public'));
 var Session = require('./models/session.js');
 app.session = new Session(app);
 
-/** Template engine **/
-var fs = require('fs');
+/** Init templating engine **/
 /**
  * options parameter must respect that format :
  *  {
@@ -25,56 +24,7 @@ var fs = require('fs');
  */
 // Init option parameter object for template engine
 app.renderData = {app : app};
-
-app.engine('.ntl', function (filePath, options, callback) {
-    fs.readFile(filePath, function (err, content) {
-
-        if(err) {
-            return callback(err);
-        }
-        var rendered = content.toString();
-
-        // render common content
-        var text = '';
-        var variables = ['title', 'content'];
-        for(var i in variables) {
-            text = '';
-            if(options.data[variables[i]] != undefined) {
-                text = options.data[variables[i]];
-            }
-            rendered = rendered.replace('#' + variables[i] + '#', text);
-        }
-
-        // render session message
-        if(options.app.session.messages.length > 0) {
-            var mess = '';
-            for(var i in options.app.session.messages) {
-                var bgClass = 'bg-blue-light';
-                switch(options.app.session.messages[i].type) {
-                    case 'error': bgClass = 'bg-red-light';break;
-                    case 'success': bgClass = 'bg-greenthea-light';break;
-                }
-                mess += '<div class="flash-message ' + bgClass + '">' + options.app.session.messages[i].message + '</div>';
-            }
-            rendered = rendered.replace('#message#', mess);
-        } else {
-            rendered = rendered.replace('#message#', '');
-        }
-        // flush session message
-        options.app.session.flushMessage();
-
-        // Render docker data
-        if(options.data['dockerhtml'] != undefined) {
-            text = options.app.dockerHtml.renderHtml(options.data['dockerhtml'].method, options.data['dockerhtml'].data);
-            rendered = rendered.replace('#dockerhtml#', text);
-        } else {
-            rendered = rendered.replace('#dockerhtml#', '');
-        }
-        return callback(null, rendered);
-    })
-});
-app.set('views', './views', [app]);
-app.set('view engine', 'ntl');
+require('./models/templating-engine.js')(app);
 
 /** Router **/
 // common router 
