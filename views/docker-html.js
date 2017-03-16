@@ -82,7 +82,7 @@ DockerHtml.prototype.renderContainerView = function(data){
             + '</div>'
             + '<div class="w-10">'
             + '<h3>Informations</h3>'
-			// + this.renderObjectToStr(data.inspect, 'list')
+			+ this.renderObjectToStr(data.inspect, 'list')
 			+ '</div>'
 			+ '<div class="w-5">'
             + '<h3>Logs</h3>'

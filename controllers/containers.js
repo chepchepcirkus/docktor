@@ -1,27 +1,15 @@
-var RSVP = require('rsvp');
-var Promise = RSVP.Promise;
 var express = require('express');
 var router = express.Router();
 
 router.get('/', function(req, res) {
     var containerLists = null;
-    var getContainerList = function(req) {
-        var dockPromise = new Promise(function(resolve, reject) {
-            req.app.docker.listContainers({all: true}, function(err, containers) {
-                if(err) reject(err);
-                resolve(containers);
-            })
-        });
-        return dockPromise;
-    };
-
-    getContainerList(req).then(
-        function(containers) {
-            containerLists = containers
-        }, function(err) {
+    req.app.docker.listContainers({all: true}, function(err, data) {
+        if(err) {
             req.app.session.setMessage({type : 'error', text: err.message});
-            containerLists = [];
-    }).finally(function() {
+        } else {
+            containerLists = data
+        }
+
         req.app.renderData.data = {
             title:'Containers list',
             content: '<h2>Container list</h2>',
@@ -36,23 +24,24 @@ router.get('/', function(req, res) {
 
 	var container = req.app.docker.getContainer(req.params.id);
 
+    // Use Promise to avoid callbackHell
     container.inspect()
-    .then(function(container) {
-        container.logs(
-            {
+    .then(function(data) {
+        dataForView['inspect'] = data;
+    }).then(function() {
+        return container.logs({
                 stdout: 1,
                 stderr: 1,
                 tail: 100,
-                follow: 0
-            },function(err, data) {
-                data.setEncoding('utf8');
-                data.on('data', function (data) {
-                    for (var i in data) {
-                        dataForView['log'] += data[i];
-                    }
-                });
+                follow: 0});
+    }).then(function(socketLog) {
+        // stream log
+        socketLog.setEncoding('utf8');
+        socketLog.on('data', function (data) {
+            for (var i in data) {
+                dataForView['log'] += data[i];
             }
-        );
+        });
     })
     .catch(function(err) {
         req.app.session.setMessage({type: 'error', text: err.message});
@@ -102,6 +91,6 @@ router.get('/', function(req, res) {
         }
     	res.redirect('back')
     })
-})
+});
 
 module.exports = router
