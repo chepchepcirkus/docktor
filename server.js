@@ -1,5 +1,14 @@
 var express = require('express');
 var app = express();
+var _ = require('underscore');
+
+/** Default configuration **/
+var defaultArgs = {
+  port: 8080
+};
+/** Merging args with default configuration **/
+var args = require('minimist')(process.argv.slice(2));
+args = _.extend(defaultArgs, args);
 
 /** Init logger **/
 var logger = require('morgan');
@@ -62,4 +71,4 @@ app
     req.app.renderData.data = {title : '404 Not found', content : 'Sorry... Page not found'};
     res.render('default', req.app.renderData);
 })
-.listen(8080);
+.listen(args.port);
